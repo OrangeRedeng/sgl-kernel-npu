@@ -22,6 +22,8 @@ FILE(GLOB OP_SRCS
     ${PROJECT_OP_SRC_BASE}/lightning_indexer/op_host/lightning_indexer.cpp
     ${PROJECT_OP_SRC_BASE}/lightning_indexer/op_host/tiling/lightning_indexer_tiling.cpp
     ${PROJECT_OP_SRC_BASE}/tri_inv/op_host/tri_inv.cpp
+    ${PROJECT_OP_SRC_BASE}/laser_attention/op_host/ascend_la_preprocess.cpp‎
+    ${PROJECT_OP_SRC_BASE}/laser_attention/op_host/ascend_laser_attention.cpp
     )
 if(BUILD_CATLASS_MODULE)
     list(APPEND OP_SRCS
@@ -45,6 +47,8 @@ ascendc_library(no_workspace_kernel STATIC
     ${PROJECT_OP_SRC_BASE}/lora/op_kernel/sgemmv_expand_kernel.cpp
     ${PROJECT_OP_SRC_BASE}/lora/op_kernel/sgemmv_shrink_kernel.cpp
     ${PROJECT_OP_SRC_BASE}/tri_inv/op_kernel/tri_inv_kernel.cpp
+    ${PROJECT_OP_SRC_BASE}/laser_attention/op_kernel/ascend_laser_attention.cpp‎
+    ${PROJECT_OP_SRC_BASE}/laser_attention/op_kernel/la_preprocess.cpp‎
 )
 
 # kernel side files with workspace

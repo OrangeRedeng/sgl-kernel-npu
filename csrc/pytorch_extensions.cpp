@@ -92,6 +92,9 @@ TORCH_LIBRARY_FRAGMENT(npu, m)
         "              Tensor! drop_mask_opt, double scale_value, int64_t head_num, std::string input_layout,
                        double keep_prob, int64 pre_tokens, int64 next_tokens, bool is_highPrecision) -> ()");
 
+    m.def(
+        "la_preprocess_mindie_sd_impl_npu(Tensor! query, Tensor! key, Tensor! value, int64 align_len) -> ()");
+
 #ifdef BUILD_CATLASS_MODULE
     m.def("catlass_matmul_basic(Tensor tensor_a, Tensor tensor_b, Tensor(a!) tensor_c, str? format_mode=None) -> ()");
 #endif
@@ -140,6 +143,8 @@ TORCH_LIBRARY_IMPL(npu, PrivateUse1, m)
     m.impl("sgemmv_shrink", TORCH_FN(sglang::npu_kernel::sgemmv_shrink));
 
     m.impl("la_mindie_sd_impl_npu", TORCH_FN(sglang::npu_kernel::la_mindie_sd_impl_npu));
+
+    m.impl("la_preprocess_mindie_sd_impl_npu", TORCH_FN(sglang::npu_kernel::la_preprocess_mindie_sd_impl_npu));
 
 #ifdef BUILD_CATLASS_MODULE
     m.impl("catlass_matmul_basic", TORCH_FN(sglang::npu_kernel::catlass_matmul_basic));

@@ -98,7 +98,7 @@ void sgemmv_shrink(at::Tensor &x, at::Tensor &weight, at::Tensor &lora_indices,
                    at::Tensor &seq_len, at::Tensor &lora_ranks,
                    at::Tensor &lora_scales, at::Tensor &y);
 
-std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
+std::tuple<at::Tensor, at::Tensor> la(
     const at::Tensor &query, const at::Tensor &key, const at::Tensor &value,
     const c10::optional<at::Tensor> &atten_mask_opt,
     const c10::optional<at::Tensor> &alibi_mask_opt,
@@ -106,7 +106,7 @@ std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
     double scale_value, int64_t head_num, std::string input_layout,
     double keep_prob, int64_t pre_tokens, int64_t next_tokens, bool is_highPrecision);
 
-std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
+std::tuple<at::Tensor, at::Tensor, at::Tensor> la_preprocess(
     const at::Tensor &query,
     const at::Tensor &key,
     const at::Tensor &value,

@@ -13,25 +13,25 @@
 #include "lib/matmul_intf.h"
 #include "CubeForward.h"
 #include "VectorForward.h"
+#include "la_preprocess.h"
 
 using namespace AscendC;
 
 extern "C" __global__ __aicore__ void ascend_laser_attention(
-    __gm__ uint8_t * __restrict__ q_gm,
-    __gm__ uint8_t * __restrict__ k_gm,
-    __gm__ uint8_t * __restrict__ v_gm,
-    __gm__ uint8_t * __restrict__ atten_mask_gm,
-    __gm__ uint8_t *__restrict__ alibi_mask_gm, // ???
-    __gm__ uint8_t * __restrict__ drop_mask_gm, // ？？？
-    __gm__ uint8_t * __restrict__ softmax_log_max_sum_gm,
-    __gm__ uint8_t * __restrict__ attention_out_gm,
-    __gm__ uint8_t *__restrict__ workspace,
-    __gm__ uint8_t *__restrict__ tiling_para_gm)
+    GM_ADDR q_gm,
+    GM_ADDR k_gm,
+    GM_ADDR v_gm,
+    GM_ADDR atten_mask_gm,
+    GM_ADDR alibi_mask_gm, // ???
+    GM_ADDR drop_mask_gm, // ？？？
+    GM_ADDR softmax_log_max_sum_gm,
+    GM_ADDR attention_out_gm,
+    GM_ADDR workspace_in,
+    GM_ADDR tiling_in)
 {
-    GET_TILING_DATA(tiling_data_in, tiling_para_gm);
-    const AscendLaserAttentionTilingData* __restrict tiling_data = &tiling_data_in;
-    SetSysWorkspace(workspace);
-    __gm__ uint8_t* user = GetUserWorkspace(workspace);
+    auto tiling_data = reinterpret_cast<__gm__ AscendLaserAttentionTilingData *>(tiling_in);
+    SetSysWorkspace(workspace_in);
+    GM_ADDR user = GetUserWorkspace(workspace_in);
 
     int32_t y = tiling_data->coreNumPerGroup;
     int32_t f = tiling_data->coreGroupNum;

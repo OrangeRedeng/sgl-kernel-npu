@@ -144,9 +144,9 @@ TORCH_LIBRARY_IMPL(npu, PrivateUse1, m)
 
     m.impl("sgemmv_shrink", TORCH_FN(sglang::npu_kernel::sgemmv_shrink));
 
-    m.impl("la", &la_mindie_sd_impl_npu);
+    m.impl("la", TORCH_FN(sglang::npu_kernel::la));
 
-    m.impl("la_preprocess", &la_preprocess_mindie_sd_impl_npu);
+    m.impl("la_preprocess", TORCH_FN(sglang::npu_kernel::la_preprocess));
 
 #ifdef BUILD_CATLASS_MODULE
     m.impl("catlass_matmul_basic", TORCH_FN(sglang::npu_kernel::catlass_matmul_basic));

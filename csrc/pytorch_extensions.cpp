@@ -87,13 +87,15 @@ TORCH_LIBRARY_FRAGMENT(npu, m)
         "sgemmv_shrink(Tensor! x, Tensor! weight, Tensor! lora_indices, Tensor! seq_len, Tensor! lora_ranks,"
         "              Tensor! lora_scales, Tensor! y) -> ()");
 
-     m.def(
-        "la_mindie_sd_impl_npu(Tensor! query, Tensor! key, Tensor! value, Tensor! atten_mask_opt, Tensor! alibi_mask_opt,"
-        "              Tensor! drop_mask_opt, double scale_value, int64_t head_num, std::string input_layout,
-                       double keep_prob, int64 pre_tokens, int64 next_tokens, bool is_highPrecision) -> ()");
-
     m.def(
-        "la_preprocess_mindie_sd_impl_npu(Tensor! query, Tensor! key, Tensor! value, int64 align_len) -> ()");
+        "la(Tensor query, Tensor key, Tensor value, \
+        Tensor? atten_mask=None, Tensor? alibi_mask=None, Tensor? \
+        drop_mask=None, float scale_value=1.0, int head_num=2, str input_layout='BNSD', \
+        float keep_prob=1.0, int pre_tokens=2147483647, int next_tokens=1, \
+        bool is_highPrecision=True)  -> (Tensor, Tensor)");
+
+    m.def("la_preprocess(Tensor query, Tensor key, Tensor value, int align_len=256) \
+        -> (Tensor, Tensor, Tensor)");
 
 #ifdef BUILD_CATLASS_MODULE
     m.def("catlass_matmul_basic(Tensor tensor_a, Tensor tensor_b, Tensor(a!) tensor_c, str? format_mode=None) -> ()");
@@ -142,9 +144,9 @@ TORCH_LIBRARY_IMPL(npu, PrivateUse1, m)
 
     m.impl("sgemmv_shrink", TORCH_FN(sglang::npu_kernel::sgemmv_shrink));
 
-    m.impl("la_mindie_sd_impl_npu", TORCH_FN(sglang::npu_kernel::la_mindie_sd_impl_npu));
+    m.impl("la", &la_mindie_sd_impl_npu);
 
-    m.impl("la_preprocess_mindie_sd_impl_npu", TORCH_FN(sglang::npu_kernel::la_preprocess_mindie_sd_impl_npu));
+    m.impl("la_preprocess", &la_preprocess_mindie_sd_impl_npu);
 
 #ifdef BUILD_CATLASS_MODULE
     m.impl("catlass_matmul_basic", TORCH_FN(sglang::npu_kernel::catlass_matmul_basic));

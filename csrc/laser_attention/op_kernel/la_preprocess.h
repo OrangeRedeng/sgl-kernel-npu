@@ -14,6 +14,41 @@
 
 #include <kernel_operator.h>
 
+struct LaPreprocessTiling {
+    uint32_t batchSize;
+    uint32_t qSeqLen;
+    uint32_t kSeqLen;
+    uint32_t vSeqLen;
+    uint32_t headDim;
+    uint32_t headNum;
+    uint32_t alignLen;
+    uint32_t ubSize;
+};
+
+struct AscendLaserAttentionTilingData {
+    int32_t batchSize;       // B
+    int32_t headNum;         // N
+    int32_t seqSize;         // S
+    int32_t headDim;         // D
+    int32_t coreNumPerGroup; // Y
+    int32_t coreGroupNum;    // F
+
+    int32_t qSeqLength;      // qkv不等长
+    int32_t kSeqLength;      // qkv不等长
+    int32_t vSeqLength;      // qkv不等长
+    int32_t maskSeqLength;   // 预留
+    float scale;             // 预留
+    float keep_prob;         // 预留
+    int32_t pre_tokens;      // 预留
+    int32_t next_tokens;     // 预留
+
+    bool isTriangle;        // 是否倒三角
+    int32_t attenType;       // 0:MHA/1:GQA
+    int32_t sparseMode;      // 0:dense/1:sparse
+    int32_t headGroupSize;   // N/G
+    int32_t windowLen;       // sparse的滑动窗口
+    bool isHighPrecision;    // 高性能
+};
 
 namespace mmdit_ops {
 
@@ -28,7 +63,7 @@ public:
     __aicore__ inline void Init(
         GM_ADDR query, GM_ADDR key, GM_ADDR value,
         GM_ADDR outQuery, GM_ADDR outKey, GM_ADDR outValue,
-        const LaPreprocessTiling *tiling, AscendC::TPipe *pipe)
+        __gm__ const LaPreprocessTiling *tiling, AscendC::TPipe *pipe)
     {
         batchSize_ = tiling->batchSize;
         headNum_ = tiling->headNum;

@@ -49,7 +49,7 @@ ascendc_library(no_workspace_kernel STATIC
     ${PROJECT_OP_SRC_BASE}/lora/op_kernel/sgemmv_expand_kernel.cpp
     ${PROJECT_OP_SRC_BASE}/lora/op_kernel/sgemmv_shrink_kernel.cpp
     ${PROJECT_OP_SRC_BASE}/tri_inv/op_kernel/tri_inv_kernel.cpp
-    ${PROJECT_OP_SRC_BASE}/laser_attention/op_kernel/ascend_laser_attention.cpp‎
+    ${PROJECT_OP_SRC_BASE}/laser_attention/op_kernel/ascend_laser_attention.cpp
     ${PROJECT_OP_SRC_BASE}/laser_attention/op_kernel/la_preprocess.cpp‎
 )
 

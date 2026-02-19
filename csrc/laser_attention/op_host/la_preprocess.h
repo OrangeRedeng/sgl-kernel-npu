@@ -18,10 +18,16 @@
 #include <string>
 #include <tuple>
 
-std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
+namespace sglang {
+namespace npu_kernel {
+
+std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess(
     const at::Tensor &query,
     const at::Tensor &key,
     const at::Tensor &value,
     int64_t align_len = 256);
+
+}
+}
 
 #endif // LA_PREPROCESS_MINDIE_SD_IMPL_H

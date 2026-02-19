@@ -24,7 +24,7 @@ namespace {
 constexpr int EXPECTED_TENSOR_DIMENSION = 4;
 }
 
-HOST_API std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
+std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess(
     const at::Tensor &query,
     const at::Tensor &key,
     const at::Tensor &value,

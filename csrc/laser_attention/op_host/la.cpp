@@ -16,9 +16,10 @@
 #include "torch_npu/csrc/core/npu/NPUFormat.h"
 #include "la.h"
 
-using namespace at;
+namespace sglang {
+namespace npu_kernel {
 
-std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
+HOST_API std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
     const at::Tensor &query, const at::Tensor &key, const at::Tensor &value,
     const c10::optional<at::Tensor> &atten_mask_opt,
     const c10::optional<at::Tensor> &alibi_mask_opt,
@@ -74,3 +75,6 @@ std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
 
     return std::tuple<at::Tensor, at::Tensor>(softmax_log_max_sum, attention_out);
 }
+
+}  // namespace npu_kernel
+}  // namespace sglang

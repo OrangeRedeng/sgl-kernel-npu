@@ -19,7 +19,7 @@
 namespace sglang {
 namespace npu_kernel {
 
-HOST_API std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
+std::tuple<at::Tensor, at::Tensor> la(
     const at::Tensor &query, const at::Tensor &key, const at::Tensor &value,
     const c10::optional<at::Tensor> &atten_mask_opt,
     const c10::optional<at::Tensor> &alibi_mask_opt,
@@ -29,7 +29,7 @@ HOST_API std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
 {
     size_t query_dim = query.sizes().size();
     if (query_dim != 4) { // 4 is the first input dimension
-        throw std::invalid_argument("The first input dimension of la must be 4 but got " + str(query_dim));
+        throw std::invalid_argument("The first input dimension of la must be 4 but got " + at::str(query_dim));
     }
     const at::Tensor& atten_mask = c10::value_or_else(atten_mask_opt, [] {return at::Tensor();});
     const at::Tensor& alibi_mask = c10::value_or_else(alibi_mask_opt, [] {return at::Tensor();});

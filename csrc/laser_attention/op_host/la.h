@@ -18,12 +18,18 @@
 #include <string>
 #include <tuple>
 
-std::tuple<at::Tensor, at::Tensor> la_mindie_sd_impl_npu(
+namespace sglang {
+namespace npu_kernel {
+
+std::tuple<at::Tensor, at::Tensor> la(
     const at::Tensor &query, const at::Tensor &key, const at::Tensor &value,
     const c10::optional<at::Tensor> &atten_mask_opt,
     const c10::optional<at::Tensor> &alibi_mask_opt,
     const c10::optional<at::Tensor> &drop_mask_opt,
     double scale_value, int64_t head_num, std::string input_layout,
     double keep_prob, int64_t pre_tokens, int64_t next_tokens, bool is_highPrecision);
+
+}
+}
 
 #endif // LA_MINDIE_SD_IMPL_H

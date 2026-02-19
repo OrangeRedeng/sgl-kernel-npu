@@ -17,13 +17,14 @@
 #include "torch_npu/csrc/core/npu/NPUFormat.h"
 #include "la_preprocess.h"
 
-using namespace at;
+namespace sglang {
+namespace npu_kernel {
 
 namespace {
 constexpr int EXPECTED_TENSOR_DIMENSION = 4;
 }
 
-std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
+HOST_API std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
     const at::Tensor &query,
     const at::Tensor &key,
     const at::Tensor &value,
@@ -66,3 +67,6 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor>la_preprocess_mindie_sd_impl_npu(
 
     return std::make_tuple(out_query, out_key, out_value);
 }
+
+}  // namespace npu_kernel
+}  // namespace sglang

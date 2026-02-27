@@ -16,6 +16,14 @@
 #include "torch_npu/csrc/core/npu/NPUFormat.h"
 #include "la.h"
 
+#include <stdexcept>
+#include "defines.h"
+#include "common.h"
+#include "torch_helper.h"
+#include "aclrtlaunch_ascend_laser_attention.h"
+
+#include "tiling/platform/platform_ascendc.h"
+
 namespace sglang {
 namespace npu_kernel {
 
@@ -45,7 +53,7 @@ std::tuple<at::Tensor, at::Tensor> la(
 
     at_npu::native::OpCommand cmd;
 
-    cmd.Name("AscendLaserAttention")
+    /*cmd.Name("AscendLaserAttention")
             .Input(query, "query")
             .Input(key, "key")
             .Input(value, "value");
@@ -71,8 +79,60 @@ std::tuple<at::Tensor, at::Tensor> la(
     .Attr("pre_tokens", pre_tokens)
     .Attr("next_tokens", next_tokens)
     .Attr("is_highPrecision", is_highPrecision)
-    .Run();
+    .Run();*/
+    
+    
+    
+    auto tilingBuffer = at::empty({sizeof(AscendLaserAttentionTilingData)}, at::TensorOptions().dtype(at::kByte).device(at::kCPU));
+    AscendLaserAttentionTilingData *tilingData = reinterpret_cast<AscendLaserAttentionTilingData *>(tilingBuffer.data_ptr());
+    
+    tilingData->batchSize = query.size(0);
+    tilingData->headNum = head_num;
+    tilingData->seqSize = query.size(2);
+    tilingData->headDim = query.size(3);
 
+    tilingData->qSeqLength = query.size(2);
+    tilingData->kSeqLength = key.size(2);
+    tilingData->vSeqLength = value.size(2);
+    tilingData->maskSeqLength = 0;
+    tilingData->scale = scale_value;
+    tilingData->isTriangle = false;
+    
+    auto ascendcPlatform = *platform_ascendc::PlatformAscendCManager::GetInstance();
+    uint32_t aicNum = ascendcPlatform.GetCoreNumAic();
+
+    auto col_size = key.size(2);
+
+    int32_t coreNumPerGroup = 1;
+    int32_t factor = 2;
+    if (col_size <= 8 * 1024 / factor) {    // value is 8 * 1024
+        coreNumPerGroup = 1;
+    } else if (col_size > 8 * 1024 / factor && col_size <= 16 * 1024 / factor) {    // value is 8?16?1024
+        coreNumPerGroup = 2;    // 2 is coreNumPerGroup
+    } else if (col_size > 16 * 1024 / factor && col_size <= 32 * 1024 / factor) {    // value is 16?32?1024
+        coreNumPerGroup = 4;    // 4 is coreNumPerGroup
+    } else {
+        if (aicNum == 20) {    // 20 is aicNum
+            coreNumPerGroup = 4;    // 4 is coreNumPerGroup
+        } else {
+            coreNumPerGroup = 8;    // 8 is coreNumPerGroup
+        }
+    }
+    
+    int32_t groupNum;
+    groupNum = aicNum / coreNumPerGroup;
+    
+    auto rowSumSize = query.size(0) * head_num * query.size(2) * sizeof(float);
+    
+    size_t workspace_size = groupNum * 128 * 128 * 32 * 2 * 4 +    // 128?32?2?4 is offset
+                    groupNum * 256 * 128 * 8 * 2 * 4 * 2 +    // 256?128?8?2?4 is offset
+                    rowSumSize;
+    
+    
+    auto workspace_tensor = at::empty({workspace_size}, at::TensorOptions().dtype(at::kByte).device(query.options().device()));
+    
+    EXEC_KERNEL_CMD(ascend_laser_attention, groupNum, query, key, value, atten_mask, alibi_mask, drop_mask, softmax_log_max_sum, attention_out, workspace_tensor, tilingBuffer);
+    
     return std::tuple<at::Tensor, at::Tensor>(softmax_log_max_sum, attention_out);
 }
 

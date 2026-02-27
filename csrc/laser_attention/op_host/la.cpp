@@ -128,13 +128,14 @@ std::tuple<at::Tensor, at::Tensor> la(
                     groupNum * 256 * 128 * 8 * 2 * 4 * 2 +    // 256?128?8?2?4 is offset
                     rowSumSize;
     
-    
+    void *ptr = 0;
     auto workspace_tensor = at::empty({workspace_size}, at::TensorOptions().dtype(at::kByte).device(query.options().device()));
     
-    EXEC_KERNEL_CMD(ascend_laser_attention, groupNum, query, key, value, atten_mask, alibi_mask, drop_mask, softmax_log_max_sum, attention_out, workspace_tensor, tilingBuffer);
+    EXEC_KERNEL_CMD(ascend_laser_attention, groupNum, query, key, value, ptr, ptr, ptr, softmax_log_max_sum, attention_out, workspace_tensor, tilingBuffer);
     
     return std::tuple<at::Tensor, at::Tensor>(softmax_log_max_sum, attention_out);
 }
 
 }  // namespace npu_kernel
 }  // namespace sglang
+
